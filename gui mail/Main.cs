@@ -49,6 +49,10 @@ namespace gui_mail
             public String TieuDe { get; set; }
             public String NoiDung { get; set; }
         }
+        public class Keytlists
+        {
+            public String Key { get; set; }
+        }
         #endregion
         public void SendBtn_Click()
         {
@@ -70,6 +74,7 @@ namespace gui_mail
                                               NoiDung = xml2.Element("NoiDung").Value
                                           }).ToList();
 
+            
             //Tách chuỗi mail nhận
             List<string> List = new List<string>();
             string chuoi1 = TxtMailNhan.Text.Trim();
