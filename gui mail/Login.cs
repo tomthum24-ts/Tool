@@ -28,35 +28,36 @@ namespace gui_mail
 
         private void TxtGetInfo_Click(object sender, EventArgs e)
         {
-            XDocument XmlKey = XDocument.Load("Key.xml");
-            List<Keytlists> XmlKeyList = (from xml2 in XmlKey.Elements("ListKey").Elements("ListKey")
-                                          select new Keytlists
-                                          {
-                                              Key = xml2.Element("Key").Value
-                                          }).ToList();
-            var keyItem = XmlKeyList.FirstOrDefault().Key;
-            var maHoaDES = Decrypt(keyItem, "123");
-            var key = Base64Decode(maHoaDES.ToString());
-
-            SqlConnection conn = new SqlConnection(key);
-            var sqlstring = "SELECT * FROM dbo.[UserLogin] WHERE KeyLogin=N'" + TxtKey.Text + "' AND IsLock=0 ";
-            SqlCommand cmd = new SqlCommand(sqlstring, conn);
-            conn.Open();
-            SqlDataReader data = cmd.ExecuteReader();
-            if (data.Read() == true)
-            {
-                this.Hide();
-                Main f = new Main();
-                f.Show();
-
-            }
-            else
-            {
-                MessageBox.Show("Your acount is not existing in system or locked, please contact your admin");
-            }
+        
             try
             {
-                
+                XDocument XmlKey = XDocument.Load("Key.xml");
+                List<Keytlists> XmlKeyList = (from xml2 in XmlKey.Elements("ListKey").Elements("ListKey")
+                                              select new Keytlists
+                                              {
+                                                  Key = xml2.Element("Key").Value
+                                              }).ToList();
+                var keyItem = XmlKeyList.FirstOrDefault().Key;
+                var maHoaDES = Decrypt(keyItem, "123");
+                var key = Base64Decode(maHoaDES.ToString());
+                var keyPc = GetKeySystem();
+
+                SqlConnection conn = new SqlConnection(key);
+                var sqlstring = "SELECT * FROM dbo.[UserLogin] WHERE KeyLogin=N'" + keyPc + "' AND IsLock=0 ";
+                SqlCommand cmd = new SqlCommand(sqlstring, conn);
+                conn.Open();
+                SqlDataReader data = cmd.ExecuteReader();
+                if (data.Read() == true)
+                {
+                    this.Hide();
+                    Main f = new Main();
+                    f.Show();
+
+                }
+                else
+                {
+                    MessageBox.Show("Your acount is not existing in system or locked, please contact your admin");
+                }
             }
             catch (Exception)
             {
@@ -65,7 +66,7 @@ namespace gui_mail
             }
            
         }
-        private void BtnGetKey_Click(object sender, EventArgs e)
+        private string GetKeySystem()
         {
             BasicInfo myInfo = new BasicInfo
             {
@@ -82,6 +83,11 @@ namespace gui_mail
             .ToString();
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
             var key = Base64Encode(myInfo.ToString() + "DeviceID: " + deviceId.ToString());
+            return key;
+        }
+        private void BtnGetKey_Click(object sender, EventArgs e)
+        {
+            var key = GetKeySystem();
             TxtKey.Text = key.ToString();
 
         }
