@@ -23,7 +23,6 @@ namespace gui_mail
         public Login()
         {
             InitializeComponent();
-
         }
 
         private void TxtGetInfo_Click(object sender, EventArgs e)
@@ -43,7 +42,7 @@ namespace gui_mail
                 var keyPc = GetKeySystem();
 
                 SqlConnection conn = new SqlConnection(key);
-                var sqlstring = "SELECT * FROM dbo.[UserLogin] WHERE KeyLogin=N'" + keyPc + "' AND IsLock=0 ";
+                var sqlstring = "SELECT * FROM dbo.[UserLogin] WHERE KeyLogin=N'" + keyPc + "' AND IsLock!=1 ";
                 SqlCommand cmd = new SqlCommand(sqlstring, conn);
                 conn.Open();
                 SqlDataReader data = cmd.ExecuteReader();
