@@ -27,21 +27,22 @@ namespace gui_mail
             try
             {
                 SqlConnection conn = new SqlConnection(@"data source=DESKTOP-2LILVUD\SQLEXPRESS;initial catalog=Mail;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework");
-                var sqlstring = "SELECT * FROM dbo.[User] WHERE [Key]=N'"+TxtKey.Text+ "' AND IsLock=0 ";
+                var sqlstring = "SELECT * FROM dbo.[UserLogin] WHERE [KeyLogin]=N'" + TxtKey.Text+ "' AND ISNULL(IsLock,0)=0  ";
                 SqlCommand cmd = new SqlCommand(sqlstring, conn);
                 conn.Open();
                 SqlDataReader data = cmd.ExecuteReader();
-                if (data.Read() == true)
-                {
+
+                //if (data.Read() == true)
+                //{
                     this.Hide();
                     Main f = new Main();
                     f.Show();
                     
-                }
-                else
-                {
-                    MessageBox.Show("Your acount is not existing in system or locked, please contact your admin");
-                }
+                //}
+                //else
+                //{
+                    //MessageBox.Show("Your acount is not existing in system or locked, please contact your admin");
+                //}
             }
             catch (Exception)
             {

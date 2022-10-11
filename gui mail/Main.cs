@@ -74,6 +74,7 @@ namespace gui_mail
             List<string> List = new List<string>();
             string chuoi1 = TxtMailNhan.Text.Trim();
             var chuoi2 = chuoi1.Split('/');
+            var getdate = DateTime.Now.ToString("dd/MM/yyyy");
             
             int i;
             int a=1;
@@ -99,7 +100,7 @@ namespace gui_mail
                                     if (CBTuDong.Checked)
                                     {
                                         // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, ContentlList[random].TieuDe + " " + a++, ContentlList[random].NoiDung + " " + a++); //
+                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, getdate +" " + a++ + ContentlList[random].TieuDe , ContentlList[random].NoiDung + " a" + a++); //
                                         mail.IsBodyHtml = true;
                                         //gửi tin nhắn
                                         SmtpClient client = new SmtpClient("smtp.gmail.com");
@@ -115,7 +116,7 @@ namespace gui_mail
                                     else
                                     {
                                         // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, TxtTieude.Text + " " + a++, TxtContent.Text + " " + a++); //
+                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, getdate+ " "+ TxtTieude.Text + " " + a++,  TxtContent.Text + " " + a++ + getdate); //
                                         mail.IsBodyHtml = true;
                                         //gửi tin nhắn
                                         SmtpClient client = new SmtpClient("smtp.gmail.com");
