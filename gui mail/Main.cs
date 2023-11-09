@@ -1,15 +1,13 @@
-﻿using System;
+﻿using Aspose.Email;
+using Aspose.Email.Clients;
+using Aspose.Email.Clients.Smtp;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net.Mail;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
@@ -22,66 +20,106 @@ namespace gui_mail
         {
             InitializeComponent();
         }
-        string[] str2 = new string[30];
-        List<Emp> Listmail = new List<Emp>();
-        List<string> ListError = new List<string>();
-        ManualResetEvent re = new ManualResetEvent(true);
+
+        private string[] str2 = new string[30];
+        private List<Emp> Listmail = new List<Emp>();
+        private List<string> ListError = new List<string>();
+        private ManualResetEvent re = new ManualResetEvent(true);
         public Boolean run = true;
+
         #region Class
+
         public class Emp
         {
             public string UsernameMail { get; set; }
             public string PasswordMail { get; set; }
+
             public Emp(string UsernameMail, string PasswordMail)
             {
-
                 this.UsernameMail = UsernameMail;
                 this.PasswordMail = PasswordMail;
             }
         }
+
         public class Emaillists
         {
             public String UserName { get; set; }
             public String Password { get; set; }
         }
+
         public class Contentlists
         {
             public String TieuDe { get; set; }
             public String NoiDung { get; set; }
         }
-        #endregion
-        public void SendBtn_Click()
-        {
-           
-             XDocument XmlEmail = XDocument.Load("EmailList.xml");
-             List<Emaillists> EmailList = (from xml in XmlEmail.Elements("ListMail").Elements("Email")
-                                      select new Emaillists
-                                      {
-                                          UserName = xml.Element("UserName").Value,
-                                          Password = xml.Element("Password").Value
-                                      }).ToList();
 
+        #endregion Class
+
+        private void ContentMail(string mailReceive)
+        {
+            // Tạo một thể hiện mới của lớp MailMessage
+            MailMessage message = new MailMessage();
+
+            // Đặt chủ đề của tin nhắn, nội dung Html và thông tin người gửi
+            message.Subject = TxtChuDe.Text;
+            message.HtmlBody = TxtNoiDung.Text;
+            message.From = new MailAddress("admin@azm.pics", "Sender Name", false);
+            message.To.Add(new MailAddress(mailReceive, "Recipient 1", false));
+
+            // Lưu tin nhắn ở định dạng EML/EMLX/MSG/MHTML
+            message.Save("EmailMessage.eml", Aspose.Email.SaveOptions.DefaultEml);
+        }
+
+        private void MailConfig(string receiveMail,string userName,string passWord)
+        {
+            ContentMail(receiveMail);
+            // Tạo phiên bản MailMessage. Bạn có thể tạo một tin nhắn mới hoặc tải một tệp tin nhắn đã tạo (eml, msg, v.v.)
+            MailMessage msg = MailMessage.Load("EmailMessage.eml");
+
+            // Tạo một thể hiện của lớp SmtpClient
+            SmtpClient client = new SmtpClient();
+
+            // Chỉ định Máy chủ gửi thư, Tên người dùng, Mật khẩu, Cổng # và tùy chọn Bảo mật của bạn
+            client.Host = label1.Text;
+            client.Username = userName;
+            client.Password = passWord;
+            client.Port = int.Parse(TxtPort.Text);
+            client.SecurityOptions = SecurityOptions.SSLExplicit;
+            // Gửi email này
+            //client.Send(msg);
+        }
+
+        public void SendMail()
+        {
+            XDocument XmlEmail = XDocument.Load("EmailList.xml");
+            List<Emaillists> EmailList = (from xml in XmlEmail.Elements("ListMail").Elements("Email")
+                                          select new Emaillists
+                                          {
+                                              UserName = xml.Element("UserName").Value,
+                                              Password = xml.Element("Password").Value
+                                          }).ToList();
 
             XDocument XmlContent = XDocument.Load("ContentList.xml");
             List<Contentlists> ContentlList = (from xml2 in XmlContent.Elements("ListContent").Elements("ListContent")
-                                          select new Contentlists
-                                          {
-                                              TieuDe = xml2.Element("TieuDe").Value,
-                                              NoiDung = xml2.Element("NoiDung").Value
-                                          }).ToList();
+                                               select new Contentlists
+                                               {
+                                                   TieuDe = xml2.Element("TieuDe").Value,
+                                                   NoiDung = xml2.Element("NoiDung").Value
+                                               }).ToList();
 
             //Tách chuỗi mail nhận
             List<string> List = new List<string>();
             string chuoi1 = TxtMailNhan.Text.Trim();
-            var chuoi2 = chuoi1.Split('/');
+            var chuoi2 = chuoi1.Split('\n');
+
             var getdate = DateTime.Now.ToString("dd/MM/yyyy");
-            
+
             int i;
-            int a=1;
+            int a = 1;
             int thanhcong = 0;
             int thatbai = 0;
             int soluong = int.Parse(TxtSoluongmail.Text);
-            for (i=0 ; i <soluong; i++)
+            for (i = 0; i < soluong; i++)
             {
                 foreach (var item in EmailList)
                 {
@@ -89,80 +127,11 @@ namespace gui_mail
                     {
                         try
                         {
-                            if (RdGmail.Checked == true)
+                            foreach (var item2 in chuoi2)
                             {
-                                foreach (var item2 in chuoi2)
-                                {
-                                   
-                                    var randomContent = new Random();
-                                    int countContent = ContentlList.Count();
-                                    int random = randomContent.Next(countContent);
-                                    if (CBTuDong.Checked)
-                                    {
-                                        // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, getdate +" " + a++ + ContentlList[random].TieuDe , ContentlList[random].NoiDung + " a" + a++); //
-                                        mail.IsBodyHtml = true;
-                                        //gửi tin nhắn
-                                        SmtpClient client = new SmtpClient("smtp.gmail.com");
-                                        client.Host = "smtp.gmail.com";
-                                        //ta không dùng cái mặc định đâu, mà sẽ dùng cái của riêng mình
-                                        client.UseDefaultCredentials = false;
-                                        client.Port = 587;
-                                        client.Credentials = new System.Net.NetworkCredential(item.UserName + "@gmail.com", item.Password);
-                                        client.EnableSsl = true;
-                                        client.Send(mail);
-                                        thanhcong++;
-                                    }
-                                    else
-                                    {
-                                        // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, getdate+ " "+ TxtTieude.Text + " " + a++,  TxtContent.Text + " " + a++ + getdate); //
-                                        mail.IsBodyHtml = true;
-                                        //gửi tin nhắn
-                                        SmtpClient client = new SmtpClient("smtp.gmail.com");
-                                        client.Host = "smtp.gmail.com";
-                                        //ta không dùng cái mặc định đâu, mà sẽ dùng cái của riêng mình
-                                        client.UseDefaultCredentials = false;
-                                        client.Port = 587;
-                                        client.Credentials = new System.Net.NetworkCredential(item.UserName + "@gmail.com", item.Password);
-                                        client.EnableSsl = true;
-                                        client.Send(mail);
-                                        thanhcong++;
-                                    }
-                                  
-                                }
-                                
-                            }
-                            if (RdOutlook.Checked == true)
-                            {
+                                var getName = item2.Replace("\r", "");
                                 // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                MailMessage mail = new MailMessage("ConnieDesiin@outlook.com", TxtMailNhan.Text, TxtTieude.Text + " " + a++, TxtContent.Text + " " + a++); //
-                                mail.IsBodyHtml = true;
-                                //gửi tin nhắn
-                                SmtpClient client = new SmtpClient("smtp.office365.com");
-                                client.Host = "smtp.office365.com";
-                                //ta không dùng cái mặc định đâu, mà sẽ dùng cái của riêng mình
-                                client.UseDefaultCredentials = false;
-                                client.Port = 587;
-                                client.Credentials = new System.Net.NetworkCredential(item.UserName, item.Password);
-                                client.EnableSsl = true;
-                                client.Send(mail);
-                                thanhcong++;
-                            }
-                            if (RdYahoo.Checked == true)
-                            {
-                                // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                MailMessage mail = new MailMessage("ConnieDesiin@yahoo.com", TxtMailNhan.Text, TxtTieude.Text + " " + a++, TxtContent.Text + " " + a++); //
-                                mail.IsBodyHtml = true;
-                                //gửi tin nhắn
-                                SmtpClient client = new SmtpClient("smtp.mail.yahoo.com");
-                                client.Host = "smtp.mail.yahoo.com";
-                                //ta không dùng cái mặc định đâu, mà sẽ dùng cái của riêng mình
-                                client.UseDefaultCredentials = false;
-                                client.Port = 587;
-                                client.Credentials = new System.Net.NetworkCredential(item.UserName + "@yahoo.com", item.Password);
-                                client.EnableSsl = true;
-                                client.Send(mail);
+                                MailConfig(getName, item.UserName,item.Password);
                                 thanhcong++;
                             }
                         }
@@ -186,24 +155,24 @@ namespace gui_mail
                     else
                         break;
                 }
-                
             }
             Invoke(new Action(() =>
             {
                 button1.Enabled = true;
                 BtnStop.Enabled = false;
             }));
-            
-           MessageBox.Show("Hoàn thành");
+
+            MessageBox.Show("Hoàn thành");
         }
+
         private void threadsend()
         {
             while (run == true)
             {
                 SendBtn_Click();
             }
-               
         }
+
         //Gửi mail đồng loạt
         private void button1_Click(object sender, EventArgs e)
         {
@@ -215,15 +184,14 @@ namespace gui_mail
                 Thread thread = new Thread(() =>
                 {
                     SendBtn_Click();
-
                 }
                  );
 
                 thread.IsBackground = false;
                 thread.Start();
             }
-
         }
+
         private void BtnStop_Click(object sender, EventArgs e)
         {
             //Thread.Interrupt();
@@ -232,25 +200,28 @@ namespace gui_mail
             run = false;
             MessageBox.Show("Đã dừng gửi");
         }
+
         private void Main_Load(object sender, EventArgs e)
         {
             LoadForm();
             Loadmail();
             LoadContent();
-
         }
+
         //Button thêm nhiều email
         private void AddMultiMail_Click(object sender, EventArgs e)// thêm email vào danh sách
         {
             AddNhieuMail();
             LoadForm();
         }
+
         //Button thêm 1 email
         private void BTcheck_Click(object sender, EventArgs e)
         {
             AddMail();
             LoadForm();
         }
+
         //Button xóa email
         private void BtnDelete_Click(object sender, EventArgs e)
         {
@@ -259,15 +230,17 @@ namespace gui_mail
             LoadForm();
             MessageBox.Show("Xóa thành công");
         }
+
         private void BtnDeleteAll_Click(object sender, EventArgs e)
         {
             DeleteAll();
             Loadmail();
             LoadForm();
             MessageBox.Show("Đã xóa toàn bộ");
-            
         }
+
         #region Cell Click
+
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -280,10 +253,9 @@ namespace gui_mail
             {
                 TxtUserName.Text = null;
                 TxtPassWord.Text = null;
-
             }
-
         }
+
         private void dataGridView2_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -296,10 +268,11 @@ namespace gui_mail
             {
                 TxtChuDe.Text = null;
                 TxtNoiDung.Text = null;
-
             }
         }
-        #endregion
+
+        #endregion Cell Click
+
         private void GetMail()
         {
             XDocument xmlDoc = XDocument.Load("EmailList.xml");
@@ -310,6 +283,7 @@ namespace gui_mail
                                          Password = xml.Element("Password").Value
                                      }).ToList();
         }
+
         private void LoadForm()
         {
             button1.Enabled = true;
@@ -337,11 +311,9 @@ namespace gui_mail
                             Password = (String)item.Attribute("Password"),
                         });
                     }
-
                 }
                 catch (Exception)
                 {
-
                     string s = "<ListMail></ListMail>";
                     XmlDocument xdoc = new XmlDocument();
                     xdoc.LoadXml(s);
@@ -362,22 +334,21 @@ namespace gui_mail
                 }
                 catch (Exception)
                 {
-
                     string s = "<ListContent></ListContent>";
                     XmlDocument xdoc = new XmlDocument();
                     xdoc.LoadXml(s);
                     xdoc.Save("ContentList.xml");
                 }
-              
             }
             catch (Exception)
             {
-                
             }
         }
+
         #region Load Data
-        public void Loadmail() 
-            {
+
+        public void Loadmail()
+        {
             try
             {
                 System.Data.DataSet dataSet = new DataSet();
@@ -386,12 +357,10 @@ namespace gui_mail
             }
             catch (Exception)
             {
-
                 dataGridView1.DataSource = "null";
-
             }
-
         }
+
         public void LoadContent()
         {
             try
@@ -402,16 +371,14 @@ namespace gui_mail
             }
             catch (Exception)
             {
-
                 dataGridView2.DataSource = "null";
-
             }
-
         }
-        #endregion
+
+        #endregion Load Data
+
         //public void MultiAdd()
         //{
-
         //    //Tách chuỗi add vô list
 
         //    if (string.IsNullOrEmpty(TxtEmail.Text))
@@ -469,7 +436,9 @@ namespace gui_mail
         //        }
         //    }
         //}
+
         #region AddNew
+
         public void AddNhieuMail()
         {
             //Tách chuỗi add vô list
@@ -490,7 +459,7 @@ namespace gui_mail
                     foreach (var item in lstString)
                     {
                         var lststringCut = item.Split(' ');
-                        var Username = lststringCut[0] ;
+                        var Username = lststringCut[0];
                         var Password = lststringCut[2];
                         Emp oemp = new Emp(Username.ToString(), Password.ToString());
                         Listmail.Add(oemp);
@@ -521,13 +490,10 @@ namespace gui_mail
                             }
                             catch (Exception)
                             {
-
                                 throw;
                             }
-                            
-                            
                         }
-                        
+
                         Loadmail();
                     }
                     catch (Exception)
@@ -541,6 +507,7 @@ namespace gui_mail
                 }
             }
         }
+
         public void AddMail()
         {
             XDocument xd = XDocument.Load("EmailList.xml");
@@ -552,6 +519,7 @@ namespace gui_mail
             xd.Save("EmailList.xml");
             Loadmail();
         }
+
         public void AddContent()
         {
             XDocument xd = XDocument.Load("ContentList.xml");
@@ -563,8 +531,11 @@ namespace gui_mail
             xd.Save("ContentList.xml");
             LoadContent();
         }
-        #endregion
+
+        #endregion AddNew
+
         #region Update
+
         private void EditMail()
         {
             XmlDocument xd = new XmlDocument();
@@ -580,6 +551,7 @@ namespace gui_mail
             xd.Save("EmailList.xml");
             Loadmail();
         }
+
         private void EditContent()
         {
             XmlDocument xd = new XmlDocument();
@@ -595,8 +567,11 @@ namespace gui_mail
             xd.Save("ContentList.xml");
             LoadContent();
         }
-        #endregion
+
+        #endregion Update
+
         #region Delete
+
         private void DeleteMail()
         {
             XmlDocument xd = new XmlDocument();
@@ -611,17 +586,14 @@ namespace gui_mail
                         xd.Save("EmailList.xml");
                     }
                 }
-                
             }
             catch (Exception)
             {
-
                 //Loadmail();
             }
             Loadmail();
-
-
         }
+
         private void DeleteContent()
         {
             XmlDocument xd = new XmlDocument();
@@ -636,17 +608,14 @@ namespace gui_mail
                         xd.Save("ContentList.xml");
                     }
                 }
-
             }
             catch (Exception)
             {
-
                 //Loadmail();
             }
             LoadContent();
-
-
         }
+
         private void DeleteAll()
         {
             string s = "<ListMail></ListMail>";
@@ -654,7 +623,9 @@ namespace gui_mail
             xdoc.LoadXml(s);
             xdoc.Save("EmailList.xml");
         }
-        #endregion
+
+        #endregion Delete
+
         private void BtnOpenloi_Click(object sender, EventArgs e)
         {
             string file = @"ListError.txt";
@@ -676,17 +647,16 @@ namespace gui_mail
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if(CBTuDong.Checked)
+            if (CBTuDong.Checked)
             {
                 TxtTieude.Enabled = false;
                 TxtContent.Enabled = false;
-            }  
+            }
             else
             {
                 TxtTieude.Enabled = true;
                 TxtContent.Enabled = true;
             }
-            
         }
     }
 }
