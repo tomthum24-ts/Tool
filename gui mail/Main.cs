@@ -1,7 +1,4 @@
-﻿using Aspose.Email;
-using Aspose.Email.Clients;
-using Aspose.Email.Clients.Smtp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -11,7 +8,9 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
-
+using MailKit.Net.Smtp;
+using MailKit;
+using MimeKit;
 namespace gui_mail
 {
     public partial class Main : Form
@@ -57,36 +56,41 @@ namespace gui_mail
 
         private void ContentMail(string mailReceive)
         {
-            // Tạo một thể hiện mới của lớp MailMessage
-            MailMessage message = new MailMessage();
 
-            // Đặt chủ đề của tin nhắn, nội dung Html và thông tin người gửi
-            message.Subject = TxtChuDe.Text;
-            message.HtmlBody = TxtNoiDung.Text;
-            message.From = new MailAddress("admin@azm.pics", "Sender Name", false);
-            message.To.Add(new MailAddress(mailReceive, "Recipient 1", false));
-
-            // Lưu tin nhắn ở định dạng EML/EMLX/MSG/MHTML
-            message.Save("EmailMessage.eml", Aspose.Email.SaveOptions.DefaultEml);
         }
 
-        private void MailConfig(string receiveMail,string userName,string passWord)
+        private void MailConfig(string receiveMail, string userName, string passWord)
         {
-            ContentMail(receiveMail);
-            // Tạo phiên bản MailMessage. Bạn có thể tạo một tin nhắn mới hoặc tải một tệp tin nhắn đã tạo (eml, msg, v.v.)
-            MailMessage msg = MailMessage.Load("EmailMessage.eml");
+            var email = new MimeMessage();
 
-            // Tạo một thể hiện của lớp SmtpClient
-            SmtpClient client = new SmtpClient();
+            email.From.Add(new MailboxAddress(txtName.Text, "admin@azm.pics"));
+            email.To.Add(new MailboxAddress(receiveMail, receiveMail));
 
-            // Chỉ định Máy chủ gửi thư, Tên người dùng, Mật khẩu, Cổng # và tùy chọn Bảo mật của bạn
-            client.Host = label1.Text;
-            client.Username = userName;
-            client.Password = passWord;
-            client.Port = int.Parse(TxtPort.Text);
-            client.SecurityOptions = SecurityOptions.SSLExplicit;
-            // Gửi email này
-            //client.Send(msg);
+            email.Subject = TxtTieude.Text;
+            email.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+            {
+                Text = TxtContent.Text
+            };
+
+            using (var smtp = new SmtpClient())
+            {
+                smtp.Connect(TxtSMTP.Text.Trim(), int.Parse(TxtPort.Text), false);
+
+                // Note: only needed if the SMTP server requires authentication
+                smtp.Authenticate(userName, passWord);
+                try
+                {
+                    smtp.Send(email);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                    throw;
+                    
+                }
+               
+                smtp.Disconnect(true);
+            }
         }
 
         public void SendMail()
@@ -131,12 +135,13 @@ namespace gui_mail
                             {
                                 var getName = item2.Replace("\r", "");
                                 // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                MailConfig(getName, item.UserName,item.Password);
+                                MailConfig(getName, item.UserName, item.Password);
                                 thanhcong++;
                             }
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
+                            MessageBox.Show(ex.ToString());
                             thatbai++;
                             string loi = item.UserName + " " + item.Password;
                             ListError.Add(loi);
@@ -169,7 +174,7 @@ namespace gui_mail
         {
             while (run == true)
             {
-                SendBtn_Click();
+                SendMail();
             }
         }
 
@@ -183,7 +188,7 @@ namespace gui_mail
                 run = true;
                 Thread thread = new Thread(() =>
                 {
-                    SendBtn_Click();
+                    threadsend();
                 }
                  );
 

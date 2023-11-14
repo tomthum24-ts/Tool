@@ -31,6 +31,13 @@ namespace gui_mail
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtName = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.TxtSMTP = new System.Windows.Forms.TextBox();
+            this.TxtPort = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.CBTuDong = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
             this.NbThread = new System.Windows.Forms.NumericUpDown();
@@ -71,11 +78,6 @@ namespace gui_mail
             this.TxtNoiDung = new System.Windows.Forms.TextBox();
             this.TxtChuDe = new System.Windows.Forms.TextBox();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.TxtPort = new System.Windows.Forms.TextBox();
-            this.TxtSMTP = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NbThread)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TxtSoluongmail)).BeginInit();
@@ -88,6 +90,8 @@ namespace gui_mail
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.txtName);
+            this.groupBox1.Controls.Add(this.label14);
             this.groupBox1.Controls.Add(this.TxtSMTP);
             this.groupBox1.Controls.Add(this.TxtPort);
             this.groupBox1.Controls.Add(this.label13);
@@ -119,16 +123,82 @@ namespace gui_mail
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Gửi mail";
             // 
+            // txtName
+            // 
+            this.txtName.Location = new System.Drawing.Point(100, 260);
+            this.txtName.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtName.Name = "txtName";
+            this.txtName.Size = new System.Drawing.Size(383, 22);
+            this.txtName.TabIndex = 21;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(29, 265);
+            this.label14.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(44, 16);
+            this.label14.TabIndex = 20;
+            this.label14.Text = "Name";
+            // 
+            // TxtSMTP
+            // 
+            this.TxtSMTP.Location = new System.Drawing.Point(99, 112);
+            this.TxtSMTP.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.TxtSMTP.Name = "TxtSMTP";
+            this.TxtSMTP.Size = new System.Drawing.Size(231, 22);
+            this.TxtSMTP.TabIndex = 19;
+            this.TxtSMTP.Text = "smtp.office365.com";
+            // 
+            // TxtPort
+            // 
+            this.TxtPort.Location = new System.Drawing.Point(401, 110);
+            this.TxtPort.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.TxtPort.Name = "TxtPort";
+            this.TxtPort.Size = new System.Drawing.Size(81, 22);
+            this.TxtPort.TabIndex = 18;
+            this.TxtPort.Text = "587";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(353, 112);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(31, 16);
+            this.label13.TabIndex = 17;
+            this.label13.Text = "Port";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(24, 114);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(45, 16);
+            this.label12.TabIndex = 16;
+            this.label12.Text = "SMTP";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.ForeColor = System.Drawing.Color.Red;
+            this.label1.Location = new System.Drawing.Point(96, 218);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(218, 16);
+            this.label1.TabIndex = 15;
+            this.label1.Text = "Lưu ý: Gửi nhiều mail dạng Mail/Mail";
+            // 
             // CBTuDong
             // 
             this.CBTuDong.AutoSize = true;
-            this.CBTuDong.Location = new System.Drawing.Point(26, 76);
+            this.CBTuDong.Location = new System.Drawing.Point(27, 76);
             this.CBTuDong.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.CBTuDong.Name = "CBTuDong";
             this.CBTuDong.Size = new System.Drawing.Size(171, 20);
             this.CBTuDong.TabIndex = 14;
             this.CBTuDong.Text = "Tự điền tiêu đề nội dung";
             this.CBTuDong.UseVisualStyleBackColor = true;
+            this.CBTuDong.Visible = false;
             this.CBTuDong.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // label11
@@ -266,7 +336,7 @@ namespace gui_mail
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(21, 229);
+            this.label3.Location = new System.Drawing.Point(23, 304);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(53, 16);
             this.label3.TabIndex = 0;
@@ -283,16 +353,17 @@ namespace gui_mail
             // 
             // TxtContent
             // 
-            this.TxtContent.Location = new System.Drawing.Point(99, 292);
+            this.TxtContent.Location = new System.Drawing.Point(99, 341);
             this.TxtContent.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.TxtContent.MaxLength = 327670000;
             this.TxtContent.Multiline = true;
             this.TxtContent.Name = "TxtContent";
-            this.TxtContent.Size = new System.Drawing.Size(383, 133);
+            this.TxtContent.Size = new System.Drawing.Size(383, 84);
             this.TxtContent.TabIndex = 4;
             // 
             // TxtTieude
             // 
-            this.TxtTieude.Location = new System.Drawing.Point(99, 229);
+            this.TxtTieude.Location = new System.Drawing.Point(100, 304);
             this.TxtTieude.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.TxtTieude.Name = "TxtTieude";
             this.TxtTieude.Size = new System.Drawing.Size(383, 22);
@@ -302,9 +373,10 @@ namespace gui_mail
             // 
             this.TxtMailNhan.Location = new System.Drawing.Point(99, 148);
             this.TxtMailNhan.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.TxtMailNhan.MaxLength = 2000000000;
             this.TxtMailNhan.Multiline = true;
             this.TxtMailNhan.Name = "TxtMailNhan";
-            this.TxtMailNhan.Size = new System.Drawing.Size(383, 37);
+            this.TxtMailNhan.Size = new System.Drawing.Size(383, 68);
             this.TxtMailNhan.TabIndex = 2;
             // 
             // groupBox2
@@ -569,49 +641,6 @@ namespace gui_mail
             this.dataGridView2.TabIndex = 0;
             this.dataGridView2.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellClick);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.Color.Red;
-            this.label1.Location = new System.Drawing.Point(95, 194);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(218, 16);
-            this.label1.TabIndex = 15;
-            this.label1.Text = "Lưu ý: Gửi nhiều mail dạng Mail/Mail";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(24, 110);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(45, 16);
-            this.label12.TabIndex = 16;
-            this.label12.Text = "SMTP";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(340, 106);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(31, 16);
-            this.label13.TabIndex = 17;
-            this.label13.Text = "Port";
-            // 
-            // TxtPort
-            // 
-            this.TxtPort.Location = new System.Drawing.Point(401, 103);
-            this.TxtPort.Name = "TxtPort";
-            this.TxtPort.Size = new System.Drawing.Size(81, 22);
-            this.TxtPort.TabIndex = 18;
-            // 
-            // TxtSMTP
-            // 
-            this.TxtSMTP.Location = new System.Drawing.Point(98, 103);
-            this.TxtSMTP.Name = "TxtSMTP";
-            this.TxtSMTP.Size = new System.Drawing.Size(230, 22);
-            this.TxtSMTP.TabIndex = 19;
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -690,6 +719,8 @@ namespace gui_mail
         private System.Windows.Forms.TextBox TxtPort;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox txtName;
+        private System.Windows.Forms.Label label14;
     }
 }
 
