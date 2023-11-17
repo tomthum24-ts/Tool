@@ -20,8 +20,7 @@ namespace gui_mail
             try
             {
                 string keylogin = GetkeyInfo();
-                var key = "V2luZG93cyB2ZXJzaW9uOiBNaWNyb3NvZnQgV2luZG93cyBOVCA2LjIuOTIwMC4wClBDIE5hbWUgOiBERVNLVE9QLTQwMVZGUFoKVXNlck5hbWUgOiBpbmNvZ25pdG8KRGV2aWNlSUQ6IEE0QlhaTjlFWEVIN1NTNU1ZSjZSTUpUMDZYN1Q5NkpXOVdWQldERzUwWDVFNjRHQUU4NDA=";
-                bool flag = CheckKey(key);
+                bool flag = CheckKey(keylogin);
                 if (!flag)
                 {
                     try
