@@ -11,6 +11,8 @@ using System.Xml.Linq;
 using MailKit.Net.Smtp;
 using MailKit;
 using MimeKit;
+using System.Diagnostics.Eventing.Reader;
+
 namespace gui_mail
 {
     public partial class Main : Form
@@ -84,7 +86,7 @@ namespace gui_mail
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.ToString());
+
                     throw;
                     
                 }
@@ -133,15 +135,48 @@ namespace gui_mail
                         {
                             foreach (var item2 in chuoi2)
                             {
-                                var getName = item2.Replace("\r", "");
-                                // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                MailConfig(getName, item.UserName, item.Password);
-                                thanhcong++;
+                                if (run == true)
+                                {
+                                    try
+                                    {
+                                        var getName = item2.Replace("\r", "");
+                                        // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
+                                        MailConfig(getName, item.UserName, item.Password);
+                                        thanhcong++;
+                                        Invoke(new Action(() =>
+                                        {
+                                            int soLuongGui = thanhcong * int.Parse(NbThread.Text);
+                                            LbThanhcong.Text = soLuongGui.ToString();
+                                            LbThatbai.Text = thatbai.ToString();
+                                        }));
+                                    }
+                                    catch (Exception)
+                                    {
+
+                                        thatbai++;
+                                        string loi = item2;
+                                        ListError.Add(loi);
+                                        using (var file = new StreamWriter("ListError.txt"))
+                                        {
+                                            ListError.ForEach(v => file.WriteLine(v));
+                                        }
+                                        Invoke(new Action(() =>
+                                        {
+                                            int soLuongGui = thanhcong * int.Parse(NbThread.Text);
+                                            LbThanhcong.Text = soLuongGui.ToString();
+                                            LbThatbai.Text = thatbai.ToString();
+                                        }));
+                                    }
+                                    
+                                }
+                                else
+                                {
+                                    break;
+                                }    
                             }
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show(ex.ToString());
                             thatbai++;
                             string loi = item.UserName + " " + item.Password;
                             ListError.Add(loi);
@@ -149,26 +184,26 @@ namespace gui_mail
                             {
                                 ListError.ForEach(v => file.WriteLine(v));
                             }
+                            Invoke(new Action(() =>
+                            {
+                                int soLuongGui = thanhcong * int.Parse(NbThread.Text);
+                                LbThanhcong.Text = soLuongGui.ToString();
+                                LbThatbai.Text = thatbai.ToString();
+                            }));
                         }
-                        Invoke(new Action(() =>
-                        {
-                            int soLuongGui = thanhcong * int.Parse(NbThread.Text);
-                            LbThanhcong.Text = soLuongGui.ToString();
-                            LbThatbai.Text = thatbai.ToString();
-                        }));
                     }
-                    else
-                        break;
                 }
+
             }
             Invoke(new Action(() =>
             {
                 button1.Enabled = true;
                 BtnStop.Enabled = false;
             }));
-
             MessageBox.Show("Hoàn thành");
+            run=false;
         }
+
 
         private void threadsend()
         {
