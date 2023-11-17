@@ -1,22 +1,15 @@
 ﻿using DeviceId;
-using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 using System.Management;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace gui_mail
 {
     public partial class Login : Form
     {
+        private SqlConnection conn = new SqlConnection("server=125.212.224.205;database=nanodevp_netcore;uid=nanodevp_net;password=jx31xV*28;MultipleActiveResultSets=True;App=EntityFramework");
+
         public Login()
         {
             InitializeComponent();
@@ -26,61 +19,105 @@ namespace gui_mail
         {
             try
             {
-                SqlConnection conn = new SqlConnection(@"data source=DESKTOP-2LILVUD\SQLEXPRESS;initial catalog=Mail;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework");
-                var sqlstring = "SELECT * FROM dbo.[UserLogin] WHERE [KeyLogin]=N'" + TxtKey.Text+ "' AND ISNULL(IsLock,0)=0  ";
-                SqlCommand cmd = new SqlCommand(sqlstring, conn);
-                conn.Open();
-                SqlDataReader data = cmd.ExecuteReader();
-
-                //if (data.Read() == true)
-                //{
-                    this.Hide();
-                    Main f = new Main();
-                    f.Show();
-                    
-                //}
-                //else
-                //{
-                    //MessageBox.Show("Your acount is not existing in system or locked, please contact your admin");
-                //}
+                string keylogin = GetkeyInfo();
+                var key = "V2luZG93cyB2ZXJzaW9uOiBNaWNyb3NvZnQgV2luZG93cyBOVCA2LjIuOTIwMC4wClBDIE5hbWUgOiBERVNLVE9QLTQwMVZGUFoKVXNlck5hbWUgOiBpbmNvZ25pdG8KRGV2aWNlSUQ6IEE0QlhaTjlFWEVIN1NTNU1ZSjZSTUpUMDZYN1Q5NkpXOVdWQldERzUwWDVFNjRHQUU4NDA=";
+                bool flag = CheckKey(key);
+                if (!flag)
+                {
+                    try
+                    {
+                        InsetInfoUser();
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+                if (flag)
+                {
+                    Main main = new Main();
+                    main.ShowDialog();
+                    Close();
+                }
+                else
+                {
+                    MessageBox.Show("Your acount is not existing in system or locked, please contact your admin");
+                }
             }
             catch (Exception)
             {
-
                 MessageBox.Show("Can not connect to server");
             }
-           
         }
+
         private void BtnGetKey_Click(object sender, EventArgs e)
         {
-            BasicInfo myInfo = new BasicInfo
+            string text = GetkeyInfo();
+            TxtKey.Text = text.ToString();
+        }
+
+        private bool CheckKey(string keylogin)
+        {
+            string cmdText = "SELECT * FROM dbo.[UserMail] WHERE [KeyLogin]=N'" + keylogin.ToString() + "' AND ISNULL(IsLock,0)=0  ";
+            SqlCommand sqlCommand = new SqlCommand(cmdText, conn);
+            conn.Open();
+            SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
+            bool result = sqlDataReader.Read();
+            conn.Close();
+            return result;
+        }
+
+        private bool CheckKeyAll(string keylogin)
+        {
+            string cmdText = "SELECT * FROM dbo.[UserMail] WHERE [KeyLogin]=N'" + keylogin.ToString() + "'  ";
+            SqlCommand sqlCommand = new SqlCommand(cmdText, conn);
+            conn.Open();
+            SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
+            bool result = sqlDataReader.Read();
+            conn.Close();
+            return result;
+        }
+
+        private void InsetInfoUser()
+        {
+            string text = GetkeyInfo();
+            if (!CheckKeyAll(text))
+            {
+                string cmdText = "INSERT INTO dbo.UserMail (KeyLogin,Name,IsLock,Note) VALUES(N'" + text.ToString() + "',N'',1,N'')";
+                SqlCommand sqlCommand = new SqlCommand(cmdText, conn);
+                conn.Open();
+                SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
+                conn.Close();
+            }
+        }
+
+  
+
+        private string GetkeyInfo()
+        {
+            BasicInfo basicInfo = new BasicInfo
             {
                 OsVersion = Environment.OSVersion.ToString(),
-                PcName = Environment.MachineName,
-                UserName = Environment.UserName
+                PcName = Environment.MachineName
             };
-
-            string deviceId = new DeviceIdBuilder()
-            .AddMachineName()
-            .AddMacAddress()
-            .AddProcessorId()
-            .AddMotherboardSerialNumber()
-            .ToString();
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
-            var key = Base64Encode(myInfo.ToString() +"DeviceID: " +deviceId.ToString());
-            TxtKey.Text = key.ToString();
+            string text = new DeviceIdBuilder().AddMachineName().AddMacAddress().AddProcessorId()
+                .AddMotherboardSerialNumber()
+                .ToString();
+            return Base64Encode(basicInfo.ToString() + "DeviceID: " + text.ToString());
         }
         #region Mã hóa
+
         public static string Base64Decode(string base64EncodedData)
         {
             var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
         }
+
         public static string Base64Encode(string plainText)
         {
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
             return System.Convert.ToBase64String(plainTextBytes);
         }
-        #endregion
+
+        #endregion Mã hóa
     }
 }
