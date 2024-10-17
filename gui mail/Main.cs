@@ -85,6 +85,7 @@ namespace gui_mail
             int thanhcong = 0;
             int thatbai = 0;
             int soluong = int.Parse(TxtSoluongmail.Text);
+            var time = DateTime.UtcNow.Ticks.ToString();
             for (i=0 ; i <soluong; i++)
             {
                 foreach (var item in EmailList)
@@ -104,7 +105,7 @@ namespace gui_mail
                                     if (CBTuDong.Checked)
                                     {
                                         // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, ContentlList[random].TieuDe + " " + a++, ContentlList[random].NoiDung + " " + a++); //
+                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, ContentlList[random].TieuDe + " " + time, ContentlList[random].NoiDung + " " + a++); //
                                         mail.IsBodyHtml = true;
                                         //gửi tin nhắn
                                         SmtpClient client = new SmtpClient("smtp.gmail.com");
@@ -120,7 +121,7 @@ namespace gui_mail
                                     else
                                     {
                                         // tạo một tin nhắn và thêm những thông tin cần thiết như: ai gửi, người nhận, tên tiêu đề, và có đôi lời gì cần nhắn nhủ
-                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, TxtTieude.Text + " " + a++, TxtContent.Text + " " + a++); //
+                                        MailMessage mail = new MailMessage("ConnieDesiin@gmail.com", item2, TxtTieude.Text + " " + time, TxtContent.Text + " " + a++); //
                                         mail.IsBodyHtml = true;
                                         //gửi tin nhắn
                                         SmtpClient client = new SmtpClient("smtp.gmail.com");

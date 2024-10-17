@@ -1,4 +1,4 @@
-﻿using DeviceId;
+﻿
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -67,21 +67,22 @@ namespace gui_mail
         }
         private string GetKeySystem()
         {
-            BasicInfo myInfo = new BasicInfo
-            {
-                OsVersion = Environment.OSVersion.ToString(),
-                PcName = Environment.MachineName,
-                UserName = Environment.UserName
-            };
+            var key = "";
+            //BasicInfo myInfo = new BasicInfo
+            //{
+            //    OsVersion = Environment.OSVersion.ToString(),
+            //    PcName = Environment.MachineName,
+            //    UserName = Environment.UserName
+            //};
 
-            string deviceId = new DeviceIdBuilder()
-            .AddMachineName()
-            .AddMacAddress()
-            .AddProcessorId()
-            .AddMotherboardSerialNumber()
-            .ToString();
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
-            var key = Base64Encode(myInfo.ToString() + "DeviceID: " + deviceId.ToString());
+            //string deviceId = new DeviceIdBuilder()
+            //.AddMachineName()
+            //.AddMacAddress()
+            //.AddProcessorId()
+            //.AddMotherboardSerialNumber()
+            //.ToString();
+            //ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Processor");
+            //var key = Base64Encode(myInfo.ToString() + "DeviceID: " + deviceId.ToString());
             return key;
         }
         private void BtnGetKey_Click(object sender, EventArgs e)
